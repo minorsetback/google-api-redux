@@ -13,7 +13,6 @@ import { createBrowserHistory } from "history";
 import qs from "qs";
 
 function SearchBooks() {
-
     const [minIndex, setMinIndex] = useState(0)
     const [bookName, setBookName] = useState('');
     const [inputValue, setInputValue] = useState('');
