@@ -10,7 +10,7 @@ export const useBooksFetch = (bookName, minIndex, id) => {
         if (bookName !== "") {
             dispatch(booksActions.fetchAsync(bookName, minIndex, id));
         }
-    }, [bookName, dispatch, minIndex]);
+    }, [bookName, dispatch, minIndex, id]);
 
     const {
         data,
