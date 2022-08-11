@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react"
-import { useBooksFetch } from "../../bus/books/hooks/useBooksFetch";
+import { useBooks } from "../../bus/books/hooks/useBooks";
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import Container from 'react-bootstrap/Container';
@@ -11,12 +11,14 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import { Link } from "react-router-dom";
 import { createBrowserHistory } from "history";
 import qs from "qs";
+import Spinner from 'react-bootstrap/Spinner';
+
 
 function SearchBooks() {
     const [minIndex, setMinIndex] = useState(0)
     const [bookName, setBookName] = useState('');
     const [inputValue, setInputValue] = useState('');
-    const { data, error } = useBooksFetch(bookName, minIndex);
+    const { data, error, isFetching, Sort } = useBooks(bookName, minIndex);
     const [books, setBooks] = useState(data?.items);
     const [notSortedBooks, setNotSortedBooks] = useState(data?.items);
     const history = createBrowserHistory();
@@ -45,16 +47,6 @@ function SearchBooks() {
         // eslint-disable-next-line
     }, [bookName]);
 
-    const Sort = (id, books) => {
-        if (id === 1) {
-            setBooks(notSortedBooks)
-        }
-        if (id === 2) {
-            let sortedBooks = [...books];
-            setBooks(sortedBooks.sort((a, b) => { return new Date(b.volumeInfo.publishedDate) - new Date(a.volumeInfo.publishedDate) }))
-        }
-    }
-
     const onKeyPress = (event) => {
         if (event.key === 'Enter') {
             setBookName(inputValue)
@@ -71,7 +63,7 @@ function SearchBooks() {
     }
 
     return (
-        <div>
+        <div className="wrapper">
             <div className="d-flex">
                 <Form.Control
                     type="text"
@@ -80,6 +72,7 @@ function SearchBooks() {
                     aria-label="Search"
                     onChange={(event) => setInputValue(event.target.value)}
                     onKeyPress={onKeyPress}
+                    defaultValue={bookName}
                 />
                 <Button variant="outline-success" onClick={() => { setBookName(inputValue); setBooks([]) }}>Search</Button>
             </div>
@@ -90,8 +83,8 @@ function SearchBooks() {
                         Sort
                     </Dropdown.Toggle>
                     <Dropdown.Menu>
-                        <Dropdown.Item onClick={() => { Sort(1, books) }}>By relevance</Dropdown.Item>
-                        <Dropdown.Item onClick={() => { Sort(2, books) }}>By date</Dropdown.Item>
+                        <Dropdown.Item onClick={() => { setBooks(Sort(1)) }}>By relevance</Dropdown.Item>
+                        <Dropdown.Item onClick={() => { setBooks(Sort(2)) }}>By date</Dropdown.Item>
                     </Dropdown.Menu>
                 </Dropdown>
                 <Dropdown >
@@ -129,8 +122,16 @@ function SearchBooks() {
                     })}
                 </Row>
             </Container>
-            <Button className="loadMore" variant="outline-success" style={{ display: books !== undefined ? "block" : "none" }} onClick={() => { setMinIndex(minIndex + 30) }}>Load More</Button>
-        </div >
+            {isFetching ?
+                <div className="text-center mt-5">
+                    <Spinner animation="border" role="status" as="div">
+                        <span className="visually-hidden">Loading...</span>
+                    </Spinner>
+                </div>
+                :
+                <Button className="loadMore" variant="outline-success" style={{ display: books !== undefined ? "block" : "none" }} onClick={() => { setMinIndex(minIndex + 30) }}>Load More</Button>
+            }
+        </div>
     )
 }
 

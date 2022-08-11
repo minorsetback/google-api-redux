@@ -1,12 +1,14 @@
 import { useParams } from "react-router-dom";
-import { useBooksFetch } from "../../bus/books/hooks/useBooksFetch";
+import { useBooks } from "../../bus/books/hooks/useBooks";
 import Card from 'react-bootstrap/Card';
 import Toast from 'react-bootstrap/Toast';
 import { useNavigate } from "react-router-dom";
-import { Button } from "react-bootstrap";
+import { Button, Spinner } from "react-bootstrap";
+import parcer from "html-react-parser"
+
 function Book() {
     let { id } = useParams();
-    const { data, error } = useBooksFetch(null, null, String(id));
+    const { data, error, isFetching } = useBooks(null, null, String(id));
     const navigate = useNavigate();
 
     if (error) {
@@ -16,7 +18,15 @@ function Book() {
             </Toast>
         )
     }
-    
+
+    if (isFetching) {
+        return (
+            <Spinner animation="border" role="status" className="loader">
+                <span className="visually-hidden">Loading...</span>
+            </Spinner>
+        )
+    }
+
     return (
         <>
             <Button variant="outline-success" className='mb-2' onClick={() => navigate(-1)}>Go back</Button>
@@ -26,8 +36,8 @@ function Book() {
                     <Card.Title className="w-2">{data.volumeInfo?.title}</Card.Title>
                     <Card.Text>Categories: {data.volumeInfo?.categories}</Card.Text>
                     <Card.Text>Authors: {data.volumeInfo?.authors?.join(", ")}</Card.Text>
-                    <Card.Text>
-                        {data.volumeInfo?.description}
+                    <Card.Text as='span'>
+                        {parcer(String(data.volumeInfo?.description))}
                     </Card.Text>
                 </Card.Body>
             </Card>
