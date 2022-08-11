@@ -41,7 +41,6 @@ function Book() {
                     </Card.Text>
                 </Card.Body>
             </Card>
-
         </>
     )
 }

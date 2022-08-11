@@ -13,7 +13,6 @@ import { createBrowserHistory } from "history";
 import qs from "qs";
 import Spinner from 'react-bootstrap/Spinner';
 
-
 function SearchBooks() {
     const [minIndex, setMinIndex] = useState(0)
     const [bookName, setBookName] = useState('');
